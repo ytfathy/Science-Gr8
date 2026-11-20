@@ -1,0 +1,6 @@
+{
+  "name": "Science Explorer: Grade 8 Science Quest",
+  "description": "An interactive animated Grade 8 science learning game covering plant reproduction, genetics & inheritance, and animal behaviors & growth.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
