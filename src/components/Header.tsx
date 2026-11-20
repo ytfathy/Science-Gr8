@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Mic,
   MicOff,
+  LogOut,
 } from 'lucide-react';
 import { soundFx } from '../utils/audio.js';
 import { QuarterId } from '../data/quartersData.js';
@@ -269,6 +270,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <RotateCcw className="w-4 h-4" />
           </button>
+
+          {/* Sign out (handled by the login gate middleware on Vercel) */}
+          <a
+            href="/auth/logout"
+            className="inline-flex p-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer"
+            style={{ textDecoration: 'none' }}
+            title="Sign out · تسجيل الخروج"
+            aria-label="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
+          </a>
         </div>
       </div>
     </header>
