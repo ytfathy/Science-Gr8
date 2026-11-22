@@ -7,23 +7,6 @@
  *         Chemical_Processes_and_Equations__Tracing_Matter_and_Energy_8d18b79b.mp4
  */
 
-export const Q2_VIDEO_URL =
-  '/assets/aistudio/Chemical_Processes_and_Equations__Tracing_Matter_and_Energy_8d18b79b.mp4';
-
-export interface Q2VideoChapter {
-  label: string;
-  timeSeconds: number;
-  timeDisplay: string;
-  lessonRef: 1 | 2 | 3;
-}
-
-export const Q2_VIDEO_CHAPTERS: Q2VideoChapter[] = [
-  { label: 'Physical vs. Chemical Changes & Signs', timeSeconds: 0, timeDisplay: '0:00', lessonRef: 1 },
-  { label: 'Chemical Equations, Subscripts & Coefficients', timeSeconds: 114, timeDisplay: '1:54', lessonRef: 2 },
-  { label: 'Conservation of Matter (CH₄ & Propane)', timeSeconds: 181, timeDisplay: '3:01', lessonRef: 2 },
-  { label: 'Exothermic vs. Endothermic & Thermite System', timeSeconds: 268, timeDisplay: '4:28', lessonRef: 3 },
-];
-
 export interface Q2NotebookEntry {
   id: string;
   level: number;

@@ -5,7 +5,7 @@
  * Quarter 2 — Level 3: Thermal Energy, Reaction Rates & Chemical Engineering
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckCircle2,
   Sparkles,
@@ -19,10 +19,9 @@ import {
   Thermometer,
   AlertTriangle,
   ShieldCheck,
+  NotebookPen,
 } from 'lucide-react';
 import {
-  Q2_VIDEO_URL,
-  Q2_VIDEO_CHAPTERS,
   Q2_LEVEL_3_QUIZ,
   COLD_PACK_PAIRS,
 } from '../../data/chemistryData.js';
@@ -34,7 +33,8 @@ import {
 import { evaluateMastery } from '../../game/rules.js';
 import { soundFx, shuffleArray } from '../../utils/audio.js';
 import { LessonVideoModal } from '../LessonVideoModal.js';
-import { Quarter2VideoPlayer } from '../Quarter2VideoPlayer.js';
+import { Lesson3DExplainer } from '../Lesson3DExplainerLazy.js';
+import { Q2SummaryInfographic } from '../Q2SummaryInfographic.js';
 
 interface ThermalEnergyLevelProps {
   onAwardPoints: (pts: number) => void;
@@ -50,11 +50,10 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
   onSimulationComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'heat_transfer' | 'cold_pack' | 'rate_lab' | 'turtle_engineering' | 'video_lesson' | 'quiz'
+    'heat_transfer' | 'cold_pack' | 'rate_lab' | 'turtle_engineering' | 'video_lesson' | 'summary' | 'quiz'
   >('heat_transfer');
 
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const inlineVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Heat transfer interactive focus
   const [selectedTransfer, setSelectedTransfer] = useState<'conduction' | 'convection' | 'radiation'>('conduction');
@@ -213,9 +212,24 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
               <span>•</span>
               <span>Thermal Energy & Chemical Processes</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Thermal Energy, Reaction Rates & Engineering Design
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <h1 className="min-w-0 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Thermal Energy, Reaction Rates & Engineering Design
+              </h1>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFx.playClick();
+                  setActiveTab('summary');
+                }}
+                aria-pressed={activeTab === 'summary'}
+                className="shrink-0 self-start sm:self-center px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-50 text-slate-900 text-sm sm:text-base border-2 border-slate-800 shadow-[2px_3px_0_rgba(0,0,0,0.35)] inline-flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap -rotate-1"
+                style={{ fontFamily: '"Patrick Hand", cursive' }}
+              >
+                <NotebookPen className="w-4 h-4" />
+                <span>Summary Infographic</span>
+              </button>
+            </div>
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
               Trace energy flow through exothermic and endothermic systems, test four cold-pack chemical pairs, measure how temperature and catalysts change collision rates, and engineer a portable sea turtle egg incubator.
             </p>
@@ -819,15 +833,8 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
       {/* TAB 5: INLINE VIDEO LESSON */}
       {activeTab === 'video_lesson' && (
         <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-extrabold text-white">
-                🎬 Exothermic vs. Endothermic &amp; Tracing Matter and Energy
-              </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Starts at Chapter 4 (4:28) covering exothermic heat release, endothermic heat absorption, and the Thermite system. Press Play to begin.
-              </p>
-            </div>
+          <Lesson3DExplainer lesson={3} />
+          <div className="flex justify-end">
             <button
               type="button"
               onClick={() => {
@@ -840,36 +847,13 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-
-          <Quarter2VideoPlayer
-            defaultSrc={Q2_VIDEO_URL}
-            title="Thermal Energy and Chemical Processes Explanation Video"
-            initialTimeSeconds={268}
-            videoRef={inlineVideoRef}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            {Q2_VIDEO_CHAPTERS.map((chap) => (
-              <button
-                key={chap.label}
-                type="button"
-                onClick={() => {
-                  soundFx.playClick();
-                  if (inlineVideoRef.current) {
-                    inlineVideoRef.current.currentTime = chap.timeSeconds;
-                  }
-                }}
-                className="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-left transition cursor-pointer"
-              >
-                <div className="text-[11px] font-mono text-amber-400 font-bold">{chap.timeDisplay}</div>
-                <div className="text-xs text-slate-200 font-semibold mt-0.5 line-clamp-2">{chap.label}</div>
-              </button>
-            ))}
-          </div>
         </div>
       )}
 
       {/* TAB 6: LEVEL 3 MASTERY QUIZ */}
+      {/* SUMMARY INFOGRAPHIC */}
+      {activeTab === 'summary' && <Q2SummaryInfographic lesson={3} />}
+
       {activeTab === 'quiz' && (
         <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
@@ -976,13 +960,11 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
 
       {/* Lesson Video Modal */}
       <LessonVideoModal
+        explainer={<Lesson3DExplainer lesson={3} />}
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
         title="Thermal Energy, Exothermic vs. Endothermic & Thermite"
         topic="Thermal Energy & Chemical Processes"
-        videoSrc={Q2_VIDEO_URL}
-        chapters={Q2_VIDEO_CHAPTERS}
-        initialTimeSeconds={268}
         quarterLabel="Quarter 2 · Unit 4"
         levelNumber={3}
         accentColor="amber"

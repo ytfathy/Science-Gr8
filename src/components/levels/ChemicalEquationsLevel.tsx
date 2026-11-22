@@ -5,7 +5,7 @@
  * Quarter 2 — Level 2: Chemical Equations & Conservation of Matter
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckCircle2,
   Sparkles,
@@ -21,10 +21,9 @@ import {
   ChevronLeft,
   ChevronRight,
   XCircle,
+  NotebookPen,
 } from 'lucide-react';
 import {
-  Q2_VIDEO_URL,
-  Q2_VIDEO_CHAPTERS,
   Q2_LEVEL_2_QUIZ,
   Q2_L2_HW1_QUESTIONS,
   BALANCING_CHALLENGES,
@@ -37,7 +36,8 @@ import {
 import { evaluateMastery } from '../../game/rules.js';
 import { soundFx, shuffleArray } from '../../utils/audio.js';
 import { LessonVideoModal } from '../LessonVideoModal.js';
-import { Quarter2VideoPlayer } from '../Quarter2VideoPlayer.js';
+import { Lesson3DExplainer } from '../Lesson3DExplainerLazy.js';
+import { Q2SummaryInfographic } from '../Q2SummaryInfographic.js';
 
 interface ChemicalEquationsLevelProps {
   onAwardPoints: (pts: number) => void;
@@ -53,11 +53,10 @@ export const ChemicalEquationsLevel: React.FC<ChemicalEquationsLevelProps> = ({
   onSimulationComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'subscripts' | 'formula_counter' | 'balancer' | 'closed_system' | 'homework' | 'video_lesson' | 'quiz'
+    'subscripts' | 'formula_counter' | 'balancer' | 'closed_system' | 'homework' | 'video_lesson' | 'summary' | 'quiz'
   >('subscripts');
 
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const inlineVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Formula Atom Counter state
   const [formulaInput, setFormulaInput] = useState('(CH3)2N');
@@ -212,9 +211,24 @@ export const ChemicalEquationsLevel: React.FC<ChemicalEquationsLevelProps> = ({
               <span>•</span>
               <span>Chemical Equations & Conservation</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Chemical Formulas, Balancing & Conservation of Matter
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <h1 className="min-w-0 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Chemical Formulas, Balancing & Conservation of Matter
+              </h1>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFx.playClick();
+                  setActiveTab('summary');
+                }}
+                aria-pressed={activeTab === 'summary'}
+                className="shrink-0 self-start sm:self-center px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-50 text-slate-900 text-sm sm:text-base border-2 border-slate-800 shadow-[2px_3px_0_rgba(0,0,0,0.35)] inline-flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap -rotate-1"
+                style={{ fontFamily: '"Patrick Hand", cursive' }}
+              >
+                <NotebookPen className="w-4 h-4" />
+                <span>Summary Infographic</span>
+              </button>
+            </div>
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
               Decode subscripts and parentheses in complex formulas, balance chemical equations using coefficients only, and verify why sealed systems keep total mass constant.
             </p>
@@ -915,44 +929,14 @@ export const ChemicalEquationsLevel: React.FC<ChemicalEquationsLevelProps> = ({
       {/* TAB 6: INLINE VIDEO LESSON */}
       {activeTab === 'video_lesson' && (
         <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-rose-400">
-                Unit 4 Narrated Video Explainer • Jump to 1:54 or 3:01
-              </div>
-              <h2 className="text-xl font-extrabold text-white">
-                Chemical Equations, Subscripts & Conservation of Matter
-              </h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {Q2_VIDEO_CHAPTERS.map((ch) => (
-                <button
-                  key={ch.label}
-                  type="button"
-                  onClick={() => {
-                    soundFx.playClick();
-                    if (inlineVideoRef.current) {
-                      inlineVideoRef.current.currentTime = ch.timeSeconds;
-                    }
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-200 cursor-pointer"
-                >
-                  {ch.timeDisplay} · {ch.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Quarter2VideoPlayer
-            defaultSrc={Q2_VIDEO_URL}
-            title="Chemical Equations, Subscripts & Conservation of Matter"
-            initialTimeSeconds={114}
-            videoRef={inlineVideoRef}
-          />
+          <Lesson3DExplainer lesson={2} />
         </div>
       )}
 
       {/* TAB 6: LEVEL 2 MASTERY QUIZ */}
+      {/* SUMMARY INFOGRAPHIC */}
+      {activeTab === 'summary' && <Q2SummaryInfographic lesson={2} />}
+
       {activeTab === 'quiz' && (
         <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1045,13 +1029,11 @@ export const ChemicalEquationsLevel: React.FC<ChemicalEquationsLevelProps> = ({
 
       {/* Lesson Video Modal */}
       <LessonVideoModal
+        explainer={<Lesson3DExplainer lesson={2} />}
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
         title="Chemical Equations & Conservation of Matter"
         topic="Subscripts, Coefficients, Methane & Propane Atom Tallies"
-        videoSrc={Q2_VIDEO_URL}
-        chapters={Q2_VIDEO_CHAPTERS}
-        initialTimeSeconds={114}
         levelNumber={2}
         quarterLabel="Quarter 2 • Physical Science"
         accentColor="cyan"

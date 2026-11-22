@@ -1,13 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { X, ExternalLink, Sparkles, BookOpen, CheckCircle2, Clock } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, ExternalLink, Sparkles, BookOpen, CheckCircle2 } from 'lucide-react';
 import { soundFx } from '../utils/audio';
-import { Quarter2VideoPlayer } from './Quarter2VideoPlayer.js';
-
-export interface VideoChapterMark {
-  label: string;
-  timeSeconds: number;
-  timeDisplay: string;
-}
 
 export interface LessonVideoModalProps {
   isOpen: boolean;
@@ -15,15 +8,14 @@ export interface LessonVideoModalProps {
   title: string;
   topic: string;
   videoId?: string;
-  videoSrc?: string;
-  chapters?: VideoChapterMark[];
-  initialTimeSeconds?: number;
   quarterLabel?: string;
   levelNumber: number;
   accentColor?: 'emerald' | 'cyan' | 'amber' | 'violet';
   description?: string;
   keyTopics?: string[];
   onGoToQuiz?: () => void;
+  /** Narrated 3D lesson shown instead of the YouTube video. */
+  explainer?: React.ReactNode;
 }
 
 export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
@@ -31,18 +23,14 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
   onClose,
   title,
   videoId,
-  videoSrc,
-  chapters = [],
-  initialTimeSeconds = 0,
   quarterLabel = 'Grade 8 Science',
   levelNumber,
   accentColor = 'emerald',
   description,
   keyTopics = [],
   onGoToQuiz,
+  explainer,
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [activeChapterIdx, setActiveChapterIdx] = useState<number>(0);
 
   // Close on Escape key
   useEffect(() => {
@@ -54,13 +42,6 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
-
-  // Sync active chapter index when opened with initialTimeSeconds
-  useEffect(() => {
-    if (!isOpen || !chapters.length) return;
-    const matchIdx = chapters.findIndex((c) => c.timeSeconds === initialTimeSeconds);
-    setActiveChapterIdx(matchIdx >= 0 ? matchIdx : 0);
-  }, [isOpen, initialTimeSeconds, chapters]);
 
   if (!isOpen) return null;
 
@@ -100,17 +81,8 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
   };
 
   const theme = colorThemes[accentColor];
-  const isLocalVideo = Boolean(videoSrc);
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : '';
   const directUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : '';
-
-  const handleJumpChapter = (idx: number, seconds: number) => {
-    soundFx.playClick();
-    setActiveChapterIdx(idx);
-    if (videoRef.current) {
-      videoRef.current.currentTime = seconds;
-    }
-  };
 
   return (
     <div
@@ -172,15 +144,8 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
             </div>
           </div>
 
-          {/* 16:9 Responsive Video Container (Local MP4 or YouTube Embed, zero autoplay) */}
-          {isLocalVideo && videoSrc ? (
-            <Quarter2VideoPlayer
-              defaultSrc={videoSrc}
-              title={title}
-              initialTimeSeconds={initialTimeSeconds}
-              videoRef={videoRef}
-            />
-          ) : (
+          {/* Narrated 3D lesson, or the YouTube embed (zero autoplay) */}
+          {explainer ?? (
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl border border-slate-800 group">
               <iframe
                 className="absolute inset-0 w-full h-full border-0"
@@ -190,35 +155,6 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
               />
-            </div>
-          )}
-
-          {/* Chapter Jump Controls for Local Video */}
-          {isLocalVideo && chapters.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-violet-400" />
-                Video Chapters (Click to Seek — Press Play Anytime):
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {chapters.map((chapter, idx) => (
-                  <button
-                    key={chapter.label}
-                    type="button"
-                    onClick={() => handleJumpChapter(idx, chapter.timeSeconds)}
-                    className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl border text-left text-xs font-medium transition cursor-pointer ${
-                      activeChapterIdx === idx
-                        ? theme.chapterActive
-                        : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
-                    }`}
-                  >
-                    <span className="truncate">{chapter.label}</span>
-                    <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-900/90 border border-slate-700 shrink-0 tabular-nums">
-                      {chapter.timeDisplay}
-                    </span>
-                  </button>
-                ))}
-              </div>
             </div>
           )}
 
@@ -250,16 +186,7 @@ export const LessonVideoModal: React.FC<LessonVideoModalProps> = ({
           )}
 
           {/* Friendly Fallback / Source Notice */}
-          {isLocalVideo ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-400">
-              <div className="flex items-center gap-2">
-                <span className="text-base">ℹ️</span>
-                <span>
-                  Embedded Quarter 2 Unit 4 explainer video (6:22) — press Play in the player controls above to begin.
-                </span>
-              </div>
-            </div>
-          ) : (
+          {!explainer && (
             <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-400">
               <div className="flex items-center gap-2">
                 <span className="text-base">ℹ️</span>
