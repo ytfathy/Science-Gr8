@@ -29,6 +29,7 @@ import { soundFx, shuffleArray } from '../../utils/audio.js';
 import { LessonVideoModal } from '../LessonVideoModal.js';
 import { Lesson3DExplainer } from '../Lesson3DExplainerLazy.js';
 import { Q2SummaryInfographic } from '../Q2SummaryInfographic.js';
+import { LessonHeader } from '../LessonHeader.js';
 
 interface ChemicalReactionsLevelProps {
   onAwardPoints: (pts: number) => void;
@@ -44,7 +45,7 @@ export const ChemicalReactionsLevel: React.FC<ChemicalReactionsLevelProps> = ({
   onSimulationComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'anchor_safety' | 'density_lab' | 'changes_lab' | 'mix_it_up' | 'video_lesson' | 'summary' | 'quiz'
+    'anchor_safety' | 'density_lab' | 'changes_lab' | 'mix_it_up' | 'summary' | 'quiz'
   >('anchor_safety');
 
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -188,95 +189,39 @@ export const ChemicalReactionsLevel: React.FC<ChemicalReactionsLevelProps> = ({
     { id: 'density_lab', label: '2. Density & Properties', icon: Scale },
     { id: 'changes_lab', label: '3. Physical vs. Chemical', icon: Flame },
     { id: 'mix_it_up', label: '4. Mix It Up! & Airbags', icon: FlaskConical },
-    { id: 'video_lesson', label: '5. 🎬 Lesson Video', icon: Play },
-    { id: 'quiz', label: '6. Mastery Assessment', icon: Sparkles },
   ] as const;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      {/* Level Header Banner */}
-      <div className="rounded-3xl bg-gradient-to-br from-violet-950/90 via-slate-900 to-slate-950 border border-violet-500/30 p-6 sm:p-8 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-bold">
-              <span>Quarter 2 · Level 1 Expedition</span>
-              <span>•</span>
-              <span>Physical Science</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <h1 className="min-w-0 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Chemical Reactions & Properties of Matter
-              </h1>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFx.playClick();
-                  setActiveTab('summary');
-                }}
-                aria-pressed={activeTab === 'summary'}
-                className="shrink-0 self-start sm:self-center px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-50 text-slate-900 text-sm sm:text-base border-2 border-slate-800 shadow-[2px_3px_0_rgba(0,0,0,0.35)] inline-flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap -rotate-1"
-                style={{ fontFamily: '"Patrick Hand", cursive' }}
-              >
-                <NotebookPen className="w-4 h-4" />
-                <span>Summary Infographic</span>
-              </button>
-            </div>
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Investigate the Thermite anchor phenomenon, identify pure substances by density and characteristic properties, distinguish physical changes from chemical reactions, and run the Mix It Up! bag experiment.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                soundFx.playClick();
-                setIsVideoModalOpen(true);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-900/40 flex items-center gap-2 transition cursor-pointer whitespace-nowrap"
-            >
-              <span>🎬 Watch Lesson Explanation</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                soundFx.playClick();
-                setActiveTab('quiz');
-              }}
-              className="px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-violet-900/40 flex items-center gap-2 transition cursor-pointer whitespace-nowrap"
-            >
-              <span>Take Level 1 Quiz</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Module Navigation Pills */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  soundFx.playClick();
-                  setActiveTab(tab.id);
-                }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                  active
-                    ? 'bg-violet-600 text-white shadow-md shadow-violet-900/50'
-                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Lesson Header: title, actions, steps */}
+      <LessonHeader
+        accent="violet"
+        kicker={["Quarter 2 · Level 1 Expedition","Physical Science"]}
+        title="Chemical Reactions & Properties of Matter"
+        description="Investigate the Thermite anchor phenomenon, identify pure substances by density and characteristic properties, distinguish physical changes from chemical reactions, and run the Mix It Up! bag experiment."
+        actions={[
+          {
+            label: 'Summary Infographic',
+            hint: 'One-page handwritten notes',
+            icon: NotebookPen,
+            tone: 'summary',
+            pressed: activeTab === 'summary',
+            onClick: () => setActiveTab('summary'),
+          },
+          { label: 'Watch Lesson', hint: 'Narrated 3D explainer', icon: Play, tone: 'video', onClick: () => setIsVideoModalOpen(true) },
+          {
+            label: 'Take Level 1 Quiz',
+            hint: `${Q2_LEVEL_1_QUIZ.length} questions`,
+            icon: ArrowRight,
+            tone: 'primary',
+            pressed: activeTab === 'quiz',
+            onClick: () => setActiveTab('quiz'),
+          },
+        ]}
+        tabs={tabs}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+      />
 
       {/* TAB 1: ANCHOR PHENOMENON & LAB SAFETY */}
       {activeTab === 'anchor_safety' && (
@@ -702,13 +647,6 @@ export const ChemicalReactionsLevel: React.FC<ChemicalReactionsLevelProps> = ({
               {airbagTriggered ? 'Reset Crash Sensor (Inflated in 38 ms)' : 'Test Crash Sensor (<50 ms N₂ Gas)'}
             </button>
           </div>
-        </div>
-      )}
-
-      {/* TAB 5: INLINE VIDEO LESSON */}
-      {activeTab === 'video_lesson' && (
-        <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-4">
-          <Lesson3DExplainer lesson={1} />
         </div>
       )}
 

@@ -35,6 +35,7 @@ import { soundFx, shuffleArray } from '../../utils/audio.js';
 import { LessonVideoModal } from '../LessonVideoModal.js';
 import { Lesson3DExplainer } from '../Lesson3DExplainerLazy.js';
 import { Q2SummaryInfographic } from '../Q2SummaryInfographic.js';
+import { LessonHeader } from '../LessonHeader.js';
 
 interface ThermalEnergyLevelProps {
   onAwardPoints: (pts: number) => void;
@@ -50,7 +51,7 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
   onSimulationComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'heat_transfer' | 'cold_pack' | 'rate_lab' | 'turtle_engineering' | 'video_lesson' | 'summary' | 'quiz'
+    'heat_transfer' | 'cold_pack' | 'rate_lab' | 'turtle_engineering' | 'summary' | 'quiz'
   >('heat_transfer');
 
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -173,8 +174,6 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
     { id: 'cold_pack', label: '2. Cold Pack Lab', icon: Snowflake },
     { id: 'rate_lab', label: '3. Reaction Rate Lab', icon: Gauge },
     { id: 'turtle_engineering', label: '4. Sea Turtle Egg Warmer', icon: Wrench },
-    { id: 'video_lesson', label: '5. 🎬 Lesson Video', icon: Play },
-    { id: 'quiz', label: '6. Mastery Assessment', icon: CheckCircle2 },
   ] as const;
 
   const transferDetails = {
@@ -203,78 +202,35 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      {/* Header Banner */}
-      <div className="rounded-3xl bg-gradient-to-br from-amber-950/90 via-slate-900 to-slate-950 border border-amber-500/30 p-6 sm:p-8 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold">
-              <span>Quarter 2 · Level 3 Expedition</span>
-              <span>•</span>
-              <span>Thermal Energy & Chemical Processes</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <h1 className="min-w-0 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Thermal Energy, Reaction Rates & Engineering Design
-              </h1>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFx.playClick();
-                  setActiveTab('summary');
-                }}
-                aria-pressed={activeTab === 'summary'}
-                className="shrink-0 self-start sm:self-center px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-50 text-slate-900 text-sm sm:text-base border-2 border-slate-800 shadow-[2px_3px_0_rgba(0,0,0,0.35)] inline-flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap -rotate-1"
-                style={{ fontFamily: '"Patrick Hand", cursive' }}
-              >
-                <NotebookPen className="w-4 h-4" />
-                <span>Summary Infographic</span>
-              </button>
-            </div>
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Trace energy flow through exothermic and endothermic systems, test four cold-pack chemical pairs, measure how temperature and catalysts change collision rates, and engineer a portable sea turtle egg incubator.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                soundFx.playClick();
-                setIsVideoModalOpen(true);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-900/30 flex items-center gap-2 transition cursor-pointer whitespace-nowrap"
-            >
-              <span>🎬 Watch Lesson Explanation</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 bg-slate-900/80 p-2 rounded-2xl border border-slate-800">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                soundFx.playClick();
-                setActiveTab(tab.id);
-              }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
-                active
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-900/30'
-                  : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Lesson Header: title, actions, steps */}
+      <LessonHeader
+        accent="amber"
+        kicker={["Quarter 2 · Level 3 Expedition","Thermal Energy & Chemical Processes"]}
+        title="Thermal Energy, Reaction Rates & Engineering Design"
+        description="Trace energy flow through exothermic and endothermic systems, test four cold-pack chemical pairs, measure how temperature and catalysts change collision rates, and engineer a portable sea turtle egg incubator."
+        actions={[
+          {
+            label: 'Summary Infographic',
+            hint: 'One-page handwritten notes',
+            icon: NotebookPen,
+            tone: 'summary',
+            pressed: activeTab === 'summary',
+            onClick: () => setActiveTab('summary'),
+          },
+          { label: 'Watch Lesson', hint: 'Narrated 3D explainer', icon: Play, tone: 'video', onClick: () => setIsVideoModalOpen(true) },
+          {
+            label: 'Take Level 3 Quiz',
+            hint: `${Q2_LEVEL_3_QUIZ.length} questions`,
+            icon: ArrowRight,
+            tone: 'primary',
+            pressed: activeTab === 'quiz',
+            onClick: () => setActiveTab('quiz'),
+          },
+        ]}
+        tabs={tabs}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+      />
 
       {/* TAB 1: HEAT TRANSFER & SYSTEMS */}
       {activeTab === 'heat_transfer' && (
@@ -819,32 +775,12 @@ export const ThermalEnergyLevel: React.FC<ThermalEnergyLevelProps> = ({
               type="button"
               onClick={() => {
                 soundFx.playClick();
-                setActiveTab('video_lesson');
+                setIsVideoModalOpen(true);
               }}
               className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 flex items-center gap-2 transition cursor-pointer shrink-0"
             >
               <span>Next: Watch Video</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: INLINE VIDEO LESSON */}
-      {activeTab === 'video_lesson' && (
-        <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-5">
-          <Lesson3DExplainer lesson={3} />
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                soundFx.playClick();
-                setActiveTab('quiz');
-              }}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <span>Proceed to Level 3 Quiz</span>
-              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
